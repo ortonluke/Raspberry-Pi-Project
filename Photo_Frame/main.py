@@ -1,4 +1,5 @@
 import pygame
+from PIL import Image, ExifTags
 
 # Initialize Pygame
 pygame.init()
@@ -7,9 +8,39 @@ pygame.init()
 WIDTH, HEIGHT = 1536, 864
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-# Load the image
-image_path = 'images/test.jpg'
-image_surface = pygame.image.load(image_path)
+# Load and correct image orientation using Pillow (PIL)
+def load_corrected_image(image_path):
+    image = Image.open(image_path)
+
+    try:
+        for tag in ExifTags.TAGS:
+            if ExifTags.TAGS[tag] == "Orientation":
+                orientation_tag = tag
+                break
+        exif = image._getexif()
+        if exif and orientation_tag in exif:
+            orientation = exif[orientation_tag]
+
+            # Rotate based on EXIF orientation
+            if orientation == 3:
+                image = image.rotate(180, expand=True)
+            elif orientation == 6:
+                image = image.rotate(270, expand=True)
+            elif orientation == 8:
+                image = image.rotate(90, expand=True)
+
+    except (AttributeError, KeyError, IndexError):
+        pass  # No EXIF data or orientation tag found
+
+    return image
+
+# Load image with rotation correction
+image_path = 'images/test3.jpg'
+image = load_corrected_image(image_path)
+
+# Convert PIL image to Pygame surface
+image = image.convert("RGB")  # Ensure compatibility
+image_surface = pygame.image.fromstring(image.tobytes(), image.size, image.mode)
 
 # Calculate scale factors for both width and height
 scale_factor_width = WIDTH / image_surface.get_width()
@@ -31,11 +62,11 @@ margin_left = (WIDTH - scaled_width) // 2
 x = margin_left
 y = margin_top
 
-# Print out image and screen details for debugging
-#print("Height: ", HEIGHT)
-#print("Scaled_Height: ", scaled_height)
-#print("Width: ", WIDTH)
-#print("Scaled_Width: ", scaled_width)
+# Debug prints
+print("Height: ", HEIGHT)
+print("Scaled_Height: ", scaled_height)
+print("Width: ", WIDTH)
+print("Scaled_Width: ", scaled_width)
 
 # Run the main loop
 running = True
@@ -56,6 +87,5 @@ while running:
     # Update the display
     pygame.display.update()
 
-print("WASSUP")
 # Quit Pygame
 pygame.quit()
