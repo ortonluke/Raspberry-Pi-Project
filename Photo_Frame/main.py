@@ -56,5 +56,6 @@ while running:
     # Update the display
     pygame.display.update()
 
+print("WASSUP")
 # Quit Pygame
 pygame.quit()
