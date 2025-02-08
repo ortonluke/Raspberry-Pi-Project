@@ -84,13 +84,14 @@ def show_image_grid():
             thumbnail_x = padding
             thumbnail_y += THUMBNAIL_SIZE[1] + padding
 
-    # Create "Back" button
-    back_button = pygame.Rect((WIDTH - 200) // 2, thumbnail_y + padding, 200, 50)
+    # Create "Back" button near the bottom
+    back_button = pygame.Rect((WIDTH - 250) // 2, HEIGHT - 80, 250, 60)
     pygame.draw.rect(screen, (255, 0, 0), back_button)  # Red color
-    font = pygame.font.SysFont(None, 30)
+    font = pygame.font.SysFont(None, 35)
     back_text = font.render("Back", True, (255, 255, 255))
     screen.blit(back_text, (back_button.x + (back_button.width - back_text.get_width()) // 2,
-                           back_button.y + (back_button.height - back_text.get_height()) // 2))
+                            back_button.y + (back_button.height - back_text.get_height()) // 2))
+
 
     pygame.display.update()
     return image_buttons, back_button
@@ -100,7 +101,7 @@ def show_menu():
     screen.fill((0, 0, 0))  # Fill the screen with black
     
     # Create "Slideshow" button
-    slideshow_button = pygame.Rect((WIDTH - 200) // 2, HEIGHT // 3, 200, 50)
+    slideshow_button = pygame.Rect((WIDTH - 300) // 2, HEIGHT // 3, 300, 50)
     pygame.draw.rect(screen, (255, 255, 255), slideshow_button)  # White color
     font = pygame.font.SysFont(None, 30)
     slideshow_text = font.render("Slideshow", True, (0, 0, 0))  # Black text
@@ -108,14 +109,14 @@ def show_menu():
                                  slideshow_button.y + (slideshow_button.height - slideshow_text.get_height()) // 2))
 
     # Create "Images" button
-    images_button = pygame.Rect((WIDTH - 200) // 2, HEIGHT // 2, 200, 50)
+    images_button = pygame.Rect((WIDTH - 300) // 2, HEIGHT // 2, 300, 50)
     pygame.draw.rect(screen, (255, 255, 255), images_button)  # White color
     images_text = font.render("Images", True, (0, 0, 0))  # Black text
     screen.blit(images_text, (images_button.x + (images_button.width - images_text.get_width()) // 2,
                               images_button.y + (images_button.height - images_text.get_height()) // 2))
 
     # Create "Quit" button
-    quit_button = pygame.Rect((WIDTH - 200) // 2, HEIGHT * 2 // 3, 200, 50)
+    quit_button = pygame.Rect((WIDTH - 300) // 2, HEIGHT * 2 // 3, 300, 50)
     pygame.draw.rect(screen, (255, 0, 0), quit_button)  # Red color
     quit_text = font.render("Quit", True, (255, 255, 255))  # White text
     screen.blit(quit_text, (quit_button.x + (quit_button.width - quit_text.get_width()) // 2,
