@@ -14,7 +14,7 @@ WIDTH, HEIGHT = 1536, 864
 # Initialize Pygame
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.mouse.set_visible(True)  # Show cursor
+pygame.mouse.set_visible(False)  # Show cursor
 clock = pygame.time.Clock()
 
 # Function to load and correct image orientation using PIL

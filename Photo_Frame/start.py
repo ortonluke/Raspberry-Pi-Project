@@ -11,7 +11,7 @@ FPS = 30  # Frames per second
 # Initialize Pygame
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.mouse.set_visible(True)  # Hide cursor for a clean display
+pygame.mouse.set_visible(True)  # Show cursor for touchscreen use
 clock = pygame.time.Clock()
 
 # Thumbnail size
@@ -27,12 +27,20 @@ if not image_files:
     pygame.quit()
     exit()
 
+# Pagination settings
+padding = 20
+thumbnails_per_row = (WIDTH - padding) // (THUMBNAIL_SIZE[0] + padding)
+rows_per_page = (HEIGHT - 100) // (THUMBNAIL_SIZE[1] + padding)  # 100px reserved for Back button
+thumbnails_per_page = thumbnails_per_row * rows_per_page
+
+total_pages = (len(image_files) + thumbnails_per_page - 1) // thumbnails_per_page
+current_page = 0
+
 # Function to load and correct image orientation using PIL
 def load_corrected_image(image_path):
     image = Image.open(image_path)
 
     try:
-        # Get EXIF data to correct the orientation
         for tag in ExifTags.TAGS:
             if ExifTags.TAGS[tag] == "Orientation":
                 orientation_tag = tag
@@ -40,8 +48,6 @@ def load_corrected_image(image_path):
         exif = image._getexif()
         if exif and orientation_tag in exif:
             orientation = exif[orientation_tag]
-
-            # Rotate based on EXIF orientation
             if orientation == 3:
                 image = image.rotate(180, expand=True)
             elif orientation == 6:
@@ -53,113 +59,141 @@ def load_corrected_image(image_path):
 
     return image
 
-# Function to load and create a thumbnail for an image
+# Function to create a thumbnail for an image
 def create_thumbnail(image_path, size=THUMBNAIL_SIZE):
-    image = load_corrected_image(image_path)  # Correct orientation first
-    image.thumbnail(size)  # Resize the image to the thumbnail size
+    image = load_corrected_image(image_path)
+    image.thumbnail(size)
     return pygame.image.fromstring(image.tobytes(), image.size, image.mode)
 
-# Function to create a grid of image previews
+# Function to show image grid with pagination
 def show_image_grid():
-    screen.fill((0, 0, 0))  # Fill the screen with black
+    global current_page
+
+    screen.fill((0, 0, 0))
     
-    # Grid configuration
-    padding = 20
-    thumbnails_per_row = (WIDTH - padding) // (THUMBNAIL_SIZE[0] + padding)
+    # Grid positions
     thumbnail_x = padding
     thumbnail_y = padding
     image_buttons = []
-
-    # Create thumbnails and place them in a grid
-    for i, image_path in enumerate(image_files):
+    
+    # Get images for the current page
+    start_index = current_page * thumbnails_per_page
+    end_index = min(start_index + thumbnails_per_page, len(image_files))
+    
+    for i in range(start_index, end_index):
+        image_path = image_files[i]
         thumbnail = create_thumbnail(image_path)
         image_rect = thumbnail.get_rect(topleft=(thumbnail_x, thumbnail_y))
         
         screen.blit(thumbnail, (thumbnail_x, thumbnail_y))
         image_buttons.append((image_rect, image_path))
 
-        # Move to the next position in the grid
+        # Move to the next grid position
         thumbnail_x += THUMBNAIL_SIZE[0] + padding
-        if (i + 1) % thumbnails_per_row == 0:
+        if (i - start_index + 1) % thumbnails_per_row == 0:
             thumbnail_x = padding
             thumbnail_y += THUMBNAIL_SIZE[1] + padding
 
-    # Create "Back" button near the bottom
-    back_button = pygame.Rect((WIDTH - 250) // 2, HEIGHT - 80, 250, 60)
+    # Back Button (Positioned Near Bottom)
+    back_button = pygame.Rect((WIDTH - 200) // 2, HEIGHT - 80, 200, 50)
     pygame.draw.rect(screen, (255, 0, 0), back_button)  # Red color
-    font = pygame.font.SysFont(None, 35)
+    font = pygame.font.SysFont(None, 30)
     back_text = font.render("Back", True, (255, 255, 255))
     screen.blit(back_text, (back_button.x + (back_button.width - back_text.get_width()) // 2,
-                            back_button.y + (back_button.height - back_text.get_height()) // 2))
+                           back_button.y + (back_button.height - back_text.get_height()) // 2))
 
+    # Draw Page Indicators (Circles)
+    indicator_y = HEIGHT - 20
+    indicator_x = WIDTH // 2 - (total_pages * 15) // 2  # Center indicators
+
+    for page in range(total_pages):
+        color = (255, 255, 255) if page == current_page else (100, 100, 100)
+        pygame.draw.circle(screen, color, (indicator_x + page * 15, indicator_y), 5)
 
     pygame.display.update()
     return image_buttons, back_button
 
 # Function to create the main menu
 def show_menu():
-    screen.fill((0, 0, 0))  # Fill the screen with black
+    screen.fill((0, 0, 0))
+
+    font = pygame.font.SysFont(None, 30)
     
     # Create "Slideshow" button
     slideshow_button = pygame.Rect((WIDTH - 300) // 2, HEIGHT // 3, 300, 50)
-    pygame.draw.rect(screen, (255, 255, 255), slideshow_button)  # White color
-    font = pygame.font.SysFont(None, 30)
-    slideshow_text = font.render("Slideshow", True, (0, 0, 0))  # Black text
-    screen.blit(slideshow_text, (slideshow_button.x + (slideshow_button.width - slideshow_text.get_width()) // 2,
-                                 slideshow_button.y + (slideshow_button.height - slideshow_text.get_height()) // 2))
+    pygame.draw.rect(screen, (255, 255, 255), slideshow_button)
+    slideshow_text = font.render("Slideshow", True, (0, 0, 0))
+    screen.blit(slideshow_text, (slideshow_button.x + 100, slideshow_button.y + 15))
 
     # Create "Images" button
     images_button = pygame.Rect((WIDTH - 300) // 2, HEIGHT // 2, 300, 50)
-    pygame.draw.rect(screen, (255, 255, 255), images_button)  # White color
-    images_text = font.render("Images", True, (0, 0, 0))  # Black text
-    screen.blit(images_text, (images_button.x + (images_button.width - images_text.get_width()) // 2,
-                              images_button.y + (images_button.height - images_text.get_height()) // 2))
+    pygame.draw.rect(screen, (255, 255, 255), images_button)
+    images_text = font.render("Images", True, (0, 0, 0))
+    screen.blit(images_text, (images_button.x + 120, images_button.y + 15))
 
     # Create "Quit" button
     quit_button = pygame.Rect((WIDTH - 300) // 2, HEIGHT * 2 // 3, 300, 50)
-    pygame.draw.rect(screen, (255, 0, 0), quit_button)  # Red color
-    quit_text = font.render("Quit", True, (255, 255, 255))  # White text
-    screen.blit(quit_text, (quit_button.x + (quit_button.width - quit_text.get_width()) // 2,
-                            quit_button.y + (quit_button.height - quit_text.get_height()) // 2))
+    pygame.draw.rect(screen, (255, 0, 0), quit_button)
+    quit_text = font.render("Quit", True, (255, 255, 255))
+    screen.blit(quit_text, (quit_button.x + 130, quit_button.y + 15))
 
     pygame.display.update()
     return slideshow_button, images_button, quit_button
 
-# Function to run the main script with the selected image
+# Run an image in main.py
 def run_main(image_path):
-    subprocess.Popen(["python", "main.py", image_path])  # Start main.py in the background
+    subprocess.Popen(["python", "main.py", image_path])
 
 # Main program loop
 running = True
-in_grid = False  # Track whether we're in the image grid
+in_grid = False
+touch_start = None
 
 while running:
     if in_grid:
-        image_buttons, back_button = show_image_grid()  # Show image grid
+        image_buttons, back_button = show_image_grid()
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if back_button.collidepoint(event.pos):  # Back button clicked
-                    in_grid = False  # Exit the image grid view
-                else:
-                    # Check if any thumbnail was clicked
+                touch_start = event.pos
+
+            elif event.type == pygame.MOUSEBUTTONUP:
+                touch_end = event.pos
+                
+                if touch_start:  # Only proceed if touch_start is not None
+                    if back_button.collidepoint(event.pos):
+                        in_grid = False
+
+                    else:
+                        delta_x = touch_end[0] - touch_start[0]
+
+                        if delta_x > 50 and current_page > 0:  # Swipe Right (Previous Page)
+                            current_page -= 1
+                        elif delta_x < -50 and current_page < total_pages - 1:  # Swipe Left (Next Page)
+                            current_page += 1
+                    
+                    touch_start = None  # Reset touch
+
+                    # Check if an image was clicked
                     for button_rect, image_path in image_buttons:
-                        if button_rect.collidepoint(event.pos):  # Thumbnail clicked
-                            run_main(image_path)  # Run the main script with the selected image
-                            # Do not stop the loop to keep start.py running
+                        if button_rect.collidepoint(event.pos):
+                            run_main(image_path)
+
     else:
-        slideshow_button, images_button, quit_button = show_menu()  # Show main menu
+        slideshow_button, images_button, quit_button = show_menu()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if slideshow_button.collidepoint(event.pos):  # Slideshow clicked
-                    subprocess.Popen(["python", "slideshow.py"])  # Run slideshow script asynchronously
-                    # Do not stop the loop to keep start.py running
-                elif images_button.collidepoint(event.pos):  # Images clicked
-                    in_grid = True  # Go to image grid
-                elif quit_button.collidepoint(event.pos):  # Quit clicked
+                if slideshow_button.collidepoint(event.pos):
+                    subprocess.Popen(["python", "slideshow.py"])
+                elif images_button.collidepoint(event.pos):
+                    in_grid = True
+                elif quit_button.collidepoint(event.pos):
                     running = False
 
 pygame.quit()

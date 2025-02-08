@@ -13,6 +13,7 @@ image_path = sys.argv[1]
 
 # Initialize Pygame
 pygame.init()
+pygame.mouse.set_visible(False)  # Show cursor
 
 # Set the screen dimensions
 WIDTH, HEIGHT = 1536, 864
