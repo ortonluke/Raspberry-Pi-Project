@@ -14,7 +14,7 @@ WIDTH, HEIGHT = 1536, 864
 # Initialize Pygame
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.mouse.set_visible(True)  # Hide cursor for a clean display
+pygame.mouse.set_visible(True)  # Show cursor
 clock = pygame.time.Clock()
 
 # Function to load and correct image orientation using PIL
@@ -61,9 +61,7 @@ def prepare_image(image):
     image_surface = pygame.image.fromstring(image.tobytes(), image.size, image.mode)
 
     # Calculate scaling factor
-    scale_factor_width = WIDTH / image_surface.get_width()
-    scale_factor_height = HEIGHT / image_surface.get_height()
-    scale_factor = min(scale_factor_width, scale_factor_height)
+    scale_factor = min(WIDTH / image_surface.get_width(), HEIGHT / image_surface.get_height())
 
     # Scale image
     scaled_width = int(image_surface.get_width() * scale_factor)
@@ -76,9 +74,13 @@ def prepare_image(image):
 
     return scaled_image, (x, y)
 
-# Function to fade between images
+# Function to fade between images, now supporting immediate quit
 def fade_transition(old_image, old_pos, new_image, new_pos):
     for alpha in range(0, 256, int(255 / (FADE_TIME * FPS))):  # Fade step based on FPS
+        for event in pygame.event.get():
+            if event.type in (pygame.QUIT, pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN):
+                return False  # Exit fade transition immediately
+
         screen.fill((0, 0, 0))  # Clear screen
         old_image.set_alpha(255 - alpha)  # Reduce opacity of old image
         new_image.set_alpha(alpha)  # Increase opacity of new image
@@ -86,10 +88,10 @@ def fade_transition(old_image, old_pos, new_image, new_pos):
         screen.blit(new_image, new_pos)
         pygame.display.update()
         clock.tick(FPS)  # Control frame rate
+    return True  # Completed fade transition successfully
 
 # Main loop
 running = True
-paused = False
 index = 0
 
 # Load first image
@@ -106,32 +108,11 @@ while running:
     start_time = time.time()
     while time.time() - start_time < DISPLAY_TIME:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type in (pygame.QUIT, pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN):
                 running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False  # Immediate quit
-                elif event.key == pygame.K_SPACE:
-                    paused = not paused  # Toggle pause
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                paused = not paused  # Tap to pause/resume
-
-        # Handle pause properly
-        while paused:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                    paused = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        running = False  # Quit immediately when paused
-                        paused = False
-                    elif event.key == pygame.K_SPACE or event.type == pygame.MOUSEBUTTONDOWN:
-                        paused = False  # Resume on SPACE or tap
-            time.sleep(0.1)  # Prevent high CPU usage
-
+                break
         if not running:
-            break  # Exit loop immediately when quitting
+            break
 
     if not running:
         break  # Ensure immediate exit
@@ -145,8 +126,9 @@ while running:
     next_image = load_corrected_image(image_files[index])
     next_scaled_image, next_position = prepare_image(next_image)
 
-    # Apply fade transition
-    fade_transition(current_scaled_image, current_position, next_scaled_image, next_position)
+    # Apply fade transition; exit if quit event occurs
+    if not fade_transition(current_scaled_image, current_position, next_scaled_image, next_position):
+        break  
 
     # Set next image as current
     current_scaled_image, current_position = next_scaled_image, next_position
