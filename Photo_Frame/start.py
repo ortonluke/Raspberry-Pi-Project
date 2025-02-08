@@ -126,7 +126,7 @@ def show_menu():
 
 # Function to run the main script with the selected image
 def run_main(image_path):
-    subprocess.run(["python", "main.py", image_path])  # Pass the image path to main.py
+    subprocess.Popen(["python", "main.py", image_path])  # Start main.py in the background
 
 # Main program loop
 running = True
@@ -146,7 +146,7 @@ while running:
                     for button_rect, image_path in image_buttons:
                         if button_rect.collidepoint(event.pos):  # Thumbnail clicked
                             run_main(image_path)  # Run the main script with the selected image
-                            running = False  # Stop the loop to open the selected image
+                            # Do not stop the loop to keep start.py running
     else:
         slideshow_button, images_button, quit_button = show_menu()  # Show main menu
         for event in pygame.event.get():
@@ -154,8 +154,8 @@ while running:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if slideshow_button.collidepoint(event.pos):  # Slideshow clicked
-                    subprocess.run(["python", "slideshow.py"])  # Run slideshow script
-                    running = False
+                    subprocess.Popen(["python", "slideshow.py"])  # Run slideshow script asynchronously
+                    # Do not stop the loop to keep start.py running
                 elif images_button.collidepoint(event.pos):  # Images clicked
                     in_grid = True  # Go to image grid
                 elif quit_button.collidepoint(event.pos):  # Quit clicked
