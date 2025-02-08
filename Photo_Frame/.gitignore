@@ -1,6 +1,7 @@
 #Custom
 credentials.json
 token.pickle
+images
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
