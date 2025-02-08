@@ -35,7 +35,7 @@ def load_corrected_image(image_path):
     return image
 
 # Load image with rotation correction
-image_path = 'images/test3.jpg'
+image_path = 'images/IMG_0580.JPG'
 image = load_corrected_image(image_path)
 
 # Convert PIL image to Pygame surface
@@ -61,12 +61,6 @@ margin_left = (WIDTH - scaled_width) // 2
 # Adjust the x and y positions to center the image
 x = margin_left
 y = margin_top
-
-# Debug prints
-print("Height: ", HEIGHT)
-print("Scaled_Height: ", scaled_height)
-print("Width: ", WIDTH)
-print("Scaled_Width: ", scaled_width)
 
 # Run the main loop
 running = True
