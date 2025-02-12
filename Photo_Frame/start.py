@@ -8,11 +8,23 @@ IMAGE_FOLDER = "images"
 WIDTH, HEIGHT = 1200, 600  # Window size
 FPS = 30  # Frames per second
 
+def show_loading_screen():
+    """Display a loading screen while images are downloading."""
+    screen.fill((0, 0, 0))  # Black background
+    font = pygame.font.SysFont(None, 40)
+    loading_text = font.render("Downloading images...", True, (255, 255, 255))
+    screen.blit(loading_text, ((WIDTH - loading_text.get_width()) // 2, HEIGHT // 2))
+    pygame.display.update()
+    
 # Initialize Pygame
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.mouse.set_visible(True)  # Show cursor for touchscreen use
 clock = pygame.time.Clock()
+show_loading_screen()
+
+# Run downloader.py and wait for it to finish
+subprocess.run(["python", "downloader.py"])
 
 # Thumbnail size
 THUMBNAIL_SIZE = (150, 150)
@@ -26,6 +38,14 @@ if not image_files:
     print("No images found in the folder.")
     pygame.quit()
     exit()
+
+def show_loading_screen():
+    """Display a loading screen while images are downloading."""
+    screen.fill((0, 0, 0))  # Black background
+    font = pygame.font.SysFont(None, 40)
+    loading_text = font.render("Downloading images...", True, (255, 255, 255))
+    screen.blit(loading_text, ((WIDTH - loading_text.get_width()) // 2, HEIGHT // 2))
+    pygame.display.update()
 
 # Pagination settings
 padding = 20
@@ -58,6 +78,13 @@ def load_corrected_image(image_path):
         pass  # No EXIF data or orientation tag found
 
     return image
+
+def delete_images():
+    for file in os.listdir(IMAGE_FOLDER):
+        file_path = os.path.join(IMAGE_FOLDER, file)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+    print("All images deleted.")
 
 # Function to create a thumbnail for an image
 def create_thumbnail(image_path, size=THUMBNAIL_SIZE):
@@ -194,6 +221,7 @@ while running:
                 elif images_button.collidepoint(event.pos):
                     in_grid = True
                 elif quit_button.collidepoint(event.pos):
+                    delete_images()  # Delete images before quitting
                     running = False
 
 pygame.quit()
