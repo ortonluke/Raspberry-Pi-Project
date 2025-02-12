@@ -221,7 +221,6 @@ while running:
                 elif images_button.collidepoint(event.pos):
                     in_grid = True
                 elif quit_button.collidepoint(event.pos):
-                    delete_images()  # Delete images before quitting
                     running = False
 
 pygame.quit()
