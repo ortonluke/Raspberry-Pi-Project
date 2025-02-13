@@ -1,0 +1,8 @@
+# Ignore the virtual enviroment folder
+myenv/
+
+# Ignore .pyc files
+*.pyc
+
+# Ignore logs
+*.log
