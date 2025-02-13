@@ -9,11 +9,12 @@ IMAGE_FOLDER = "images"
 DISPLAY_TIME = 5  # Time each image is fully shown (in seconds)
 FADE_TIME = 3  # Time for the fade transition (in seconds)
 FPS = 30  # Frames per second for smooth fade
-WIDTH, HEIGHT = 1536, 864
+WIDTH, HEIGHT = 1024, 600
+os.environ['SDL_VIDEO_WINDOW_POS'] = "0,0"
 
 # Initialize Pygame
 pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.mouse.set_visible(False)  # Show cursor
 clock = pygame.time.Clock()
 

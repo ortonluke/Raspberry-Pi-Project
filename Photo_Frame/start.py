@@ -5,7 +5,7 @@ from PIL import Image, ExifTags
 
 # Configuration
 IMAGE_FOLDER = "images"
-WIDTH, HEIGHT = 1200, 600  # Window size
+WIDTH, HEIGHT = 1024, 540  # Adjusted Window size
 FPS = 30  # Frames per second
 
 def show_loading_screen():
@@ -19,7 +19,7 @@ def show_loading_screen():
 # Initialize Pygame
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.mouse.set_visible(True)  # Show cursor for touchscreen use
+pygame.mouse.set_visible(False)  # Hide cursor for touchscreen use
 clock = pygame.time.Clock()
 show_loading_screen()
 
