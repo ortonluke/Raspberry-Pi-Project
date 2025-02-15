@@ -13,13 +13,19 @@ IMAGE_FOLDER = "images"
 def authenticate_google_account():
     """Authenticate and return a Google Drive API service."""
     creds = None
+
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
             creds = pickle.load(token)
 
     if not creds or not creds.valid:
         flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
-        creds = flow.run_local_server(port=8080)
+
+        # Use xdg-open to ensure it opens in the default browser
+        os.environ["BROWSER"] = "xdg-open"
+
+        creds = flow.run_local_server(port=0)  # Will now open the system default browser
+
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)
 
