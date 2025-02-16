@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Photo Frame
+Exec=bash -c "source /home/pumpkin-pi/Projects/Photo_Frame/venv/bin/activate &&>
+Icon=/home/pumpkin-pi/Projects/Photo_Frame/picture.png
+Terminal=true
+Categories=Utility;
+Path=/home/pumpkin-pi/Projects/Photo_Frame

@@ -17,7 +17,7 @@ pygame.mouse.set_visible(False)  # Show cursor
 
 # Set the screen dimensions
 WIDTH, HEIGHT = 1024, 600
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
 # Load and correct image orientation using Pillow (PIL)
 def load_corrected_image(image_path):

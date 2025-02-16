@@ -24,7 +24,7 @@ clock = pygame.time.Clock()
 show_loading_screen()
 
 # Run downloader.py and wait for it to finish
-subprocess.run(["python", "downloader.py"])
+subprocess.run(["python3", "downloader.py"])
 
 # Thumbnail size
 THUMBNAIL_SIZE = (150, 150)
