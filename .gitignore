@@ -1,8 +1,7 @@
-# Ignore the virtual enviroment folder
-myenv/
+#Photo_Frame
+Photo_Frame/credentials.json
+Photo_Frame/token.pickle
+PHoto_Frame/images/
 
-# Ignore .pyc files
-*.pyc
-
-# Ignore logs
-*.log
+#Minecraft Server
+Minecraft_Server/
