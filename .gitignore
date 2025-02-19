@@ -1,7 +1,9 @@
 #Photo_Frame
 Photo_Frame/credentials.json
 Photo_Frame/token.pickle
-PHoto_Frame/images/
+Photo_Frame/images/
+Photo_Frame/venv/
+Photo_Frame/myenv/
 
 #Minecraft Server
 Minecraft_Server/
