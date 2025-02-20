@@ -3,7 +3,7 @@ import json
 import subprocess
 
 # Replace with your actual API key
-API_KEY = "AIzaSyCk-6yg5KAwTV88pxrrg1CUM3jest1d_U8"
+API_KEY = "REPLACE WITH THE API KEY"
 API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY
 
 def chat_with_gemini(user_input):
