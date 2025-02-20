@@ -25,12 +25,13 @@ def chat_with_gemini(user_input):
         return f"\033[91mError: {response.status_code} - {response.text}\033[0m"
 
 if __name__ == "__main__":
-    print("\033[94mFelix: Hi, I'm Felix! How can I help?\033[0m")
-    print("Type 'exit' to quit.")
+    print("\033[94mFelix: Hi, I'm Felix! How can I help? (Type 'exit' to quit)\033[0m")
     while True:
-        user_input = input("\033[92mInput: \033[0m")
-        if user_input.lower() == "exit":
-            print("\033[94mFelix: Goodbye!\033[0m")
-            break
-        response = chat_with_gemini(user_input)
-        print("\033[94mFelix:\033[0m", response)
+        if "move" in user_input.lower() or "copy" in user_input.lower() or "delete" in user_input.lower():
+            response = process_file_command(user_input)
+        elif user_input.startswith("run "):  # User wants to execute a manual command
+            command = user_input[4:].strip()
+            response = run_command(command)
+        else:
+            response = chat_with_gemini(user_input)
+
