@@ -1,9 +1,10 @@
+import os
 import requests
 import json
 import subprocess
 
 # Replace with your actual API key
-API_KEY = "REPLACE WITH THE API KEY"
+API_KEY = os.getenv("GEMINI_API_KEY")
 API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY
 
 def chat_with_gemini(user_input):
