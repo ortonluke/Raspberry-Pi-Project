@@ -49,12 +49,13 @@ def run_command(command):
             return "\033[91mCommand execution cancelled.\033[0m"
 
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        return f"\033[96m[Command Output]\033[0m\n{result.stdout}" if result.stdout else "\033[91mNo output or command failed.\033[0m"
+        return f"\033[96mDone!\033[0m\n{result.stdout}" #if result.stdout else "\033[91mNo output or command failed.\033[0m"
     except Exception as e:
         return f"\033[91mError executing command: {str(e)}\033[0m"
 
 if __name__ == "__main__":
     print("\033[94mFelix: Hi, I'm Felix! How can I help? (Type 'exit' to quit)\033[0m")
+    print()
     while True:
         user_input = input("\033[92mInput: \033[0m")
         
