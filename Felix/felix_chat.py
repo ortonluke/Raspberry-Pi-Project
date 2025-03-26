@@ -8,6 +8,41 @@ import subprocess
 API_KEY = os.getenv("GEMINI_API_KEY")
 API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY
 
+#Folder Memory System
+FOLDER_ALIAS_FILE = "folder_aliases.json"
+
+def load_folder_aliases():
+    if os.path.exists(FOLDER_ALIAS_FILE):
+        with open(FOLDER_ALIAS_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+def save_folder_aliases(aliases):
+    with open(FOLDER_ALIAS_FILE, "w") as f:
+        json.dump(aliases, f, indent=4)
+
+FOLDER_ALIASES = load_folder_aliases()
+
+def resolve_folder_alias(text):
+    for alias in FOLDER_ALIASES:
+        if alias in text.lower():
+            return text.lower().replace(alias, FOLDER_ALIASES[alias])
+    return None  # Return None if no match
+
+def prompt_for_folder(alias_name):
+    print(f"\033[93mFelix: I don't know where your '{alias_name}' is. Where can I find it?\033[0m")
+    user_path = input("Path: ").strip()
+    full_path = os.path.expanduser(user_path)
+
+    if os.path.isdir(full_path):
+        FOLDER_ALIASES[alias_name] = full_path
+        save_folder_aliases(FOLDER_ALIASES)
+        print("\033[92mGot it! I'll remember that.\033[0m")
+        return full_path
+    else:
+        print("\033[91mThat path doesn't exist. Skipping.\033[0m")
+        return None
+
 def chat_with_gemini(user_input):
     headers = {"Content-Type": "application/json"}
     data = {
@@ -65,6 +100,20 @@ if __name__ == "__main__":
         
         if user_input.startswith("@command"):
             command_request = user_input[len("@command"):].strip()
+            
+            # Try resolving any known aliases
+            for alias in FOLDER_ALIASES:
+                if alias in command_request.lower():
+                    command_request = command_request.lower().replace(alias, FOLDER_ALIASES[alias])
+                
+            # Check for unknown folder references
+            folder_pattern = re.findall(r"(my [\w\s\-]+ folder)", command_request.lower())
+            for alias in folder_pattern:
+                if alias not in FOLDER_ALIASES:
+                    resolved = prompt_for_folder(alias)
+                    if resolved:
+                        command_request = command_request.lower().replace(alias, resolved)
+                
             command = generate_command(command_request)
             if "Error" in command:
                 response = "FAILED" + command  # Show error if AI failed
