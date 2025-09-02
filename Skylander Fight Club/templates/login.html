@@ -3,13 +3,36 @@
 <head>
     <title>Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <h1>Login</h1>
-        <form method="post">
-        <input type="text" name="username" placeholder="Enter your name" required>
-        <input type="submit" value="Login">
-    </form>
+
+    <form class="login-form" method="POST" action="/">
+        <div class="form-row">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="form-row">
+        <label for="pin">PIN:</label>
+        <input type="password" id="pin" name="pin" maxlength="6" required>
+        </div>
+
+        <button type="submit">Login</button>
+  </form>
+
+
+    <div style="min-height: 1.5em; text-align: center";>
+        {% if error %}
+        <p style="color: red;">{{ error }}</p>
+        {% endif %}
+    </div>
+
+    <br style="height: 1%;">
+
+    <a href="{{ url_for('add_user') }}">
+        <button type="button">Create New User</button>
+    </a>
 </body>
 </html>
