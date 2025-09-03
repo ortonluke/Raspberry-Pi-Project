@@ -1,25 +1,19 @@
 import json
 
-USERS_FILE = "users.json"
-
 def load_users():
-    with open(USERS_FILE, "r") as f:
+    with open("users.json", "r") as f:
         return json.load(f)
 
 def save_users(users):
-    with open(USERS_FILE, "w") as f:
+    with open("users.json", "w") as f:
         json.dump(users, f, indent=4)
 
-def validate_user(username, pin):
+def add_user(username):
     users = load_users()
-    if username in users and users[username]["pin"] == pin:
-        return True
-    return False
+    if username not in users:
+        users[username] = {"XP":0, "wins":0, "skylanders":[]}
+        save_users(users)
 
-def add_user(username, pin, skylander):
+def valid_user(username):
     users = load_users()
-    if username in users:
-        return False  # already exists
-    users[username] = {"pin": pin, "skylander": skylander}
-    save_users(users)
-    return True
+    return username in users

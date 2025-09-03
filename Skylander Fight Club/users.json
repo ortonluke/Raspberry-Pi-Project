@@ -1,14 +1,7 @@
 {
     "Luke": {
-        "pin": "1111",
-        "skylander": "001"
-    },
-    "David": {
-        "pin": "1111",
-        "skylander": "002"
-    },
-    "Rowan": {
-        "pin": "1111",
-        "skylander": "003"
+        "XP": 0,
+        "wins": 0,
+        "skylanders": []
     }
 }

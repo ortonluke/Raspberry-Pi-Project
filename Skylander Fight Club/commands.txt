@@ -1,0 +1,5 @@
+Run locally: 
+python webApp.py
+
+Run with flask (most common):
+python -m flask --app webApp run --host=0.0.0.0

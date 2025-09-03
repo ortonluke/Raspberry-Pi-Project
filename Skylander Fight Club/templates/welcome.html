@@ -3,14 +3,77 @@
 <head>
     <title>Welcome</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .container {
+            display: flex;
+            height: 100vh; /* full page split */
+        }
 
+        .left {
+            flex: 1; /* takes up half */
+            background: #f4f4f4;
+            padding: 20px;
+            border-right: 2px solid #ccc;
+        }
+        .right {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .btn {
+            display: block;
+            margin: 10px 0;
+            padding: 15px 25px;
+            text-decoration: none;
+            background: #007bff;
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #007BFF;
+        }
+    </style>
+    <script>
+        const socket = io();
+
+        socket.on("connect", () => {
+            console.log("Connected to server");
+        });
+
+        socket.on("game_update", (data) => {
+            console.log("Game update:", data);
+            const btn = document.getElementById(data.game + "-btn"); 
+            if (btn) {
+                btn.textContent = data.running ? "Join " + data.game : "Create " + data.game;
+            }
+        });
+    </script>
 </head>
 <body>
-    <h1>Welcome, {{ username }}!</h1>   
-
-    <h2>Skylander: {{ skylander }}</h2>
-
-
-    <a href="{{ url_for('logout') }}">Logout</a>
+    <div class="container">
+        <div class="left">
+            <h1>Welcome, {{ username }}!</h1>   
+            <h2>Skylander: {{ skylander }}</h2>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    
+        <div class="right">
+            <h2>Game Lobby</h2>
+            {% if games and games.get(1) and games[1]["type"] == "quiplash" %}
+            <a href="{{ url_for('lobby', game_name='quiplash') }}" class="btn">Join Quiplash</a>
+            {% else %}
+                <a href="{{ url_for('start_game', game_type='quiplash') }}" class="btn">Create Quiplash</a>
+            {% endif %}
+        </div>
+    </div>
+    
 </body>
 </html>
