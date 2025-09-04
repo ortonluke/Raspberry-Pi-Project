@@ -5,5 +5,7 @@
     </head>
     <body>
         <h1>{{ game_name | capitalize }} Lobby</h1>
+
+        <a href="{{ url_for('stop_game', game_type='quiplash') }}" >Turn Off Quiplash</a>
     </body>
 </html>

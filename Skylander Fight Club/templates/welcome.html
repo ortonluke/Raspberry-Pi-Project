@@ -41,8 +41,9 @@
             background: #007BFF;
         }
     </style>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
-        const socket = io();
+        const socket = io("http://10.28.170.81:5000");
 
         socket.on("connect", () => {
             console.log("Connected to server");
@@ -50,9 +51,16 @@
 
         socket.on("game_update", (data) => {
             console.log("Game update:", data);
+
             const btn = document.getElementById(data.game + "-btn"); 
             if (btn) {
-                btn.textContent = data.running ? "Join " + data.game : "Create " + data.game;
+                if (data.running) {
+                    btn.textContent = "Join " + data.game;
+                    btn.href = "/lobby/" + data.game;
+                } else {
+                    btn.textContent = "Start " + data.game;
+                    btn.href = "/start_game/" + data.game;
+                }
             }
         });
     </script>
@@ -67,11 +75,8 @@
     
         <div class="right">
             <h2>Game Lobby</h2>
-            {% if games and games.get(1) and games[1]["type"] == "quiplash" %}
-            <a href="{{ url_for('lobby', game_name='quiplash') }}" class="btn">Join Quiplash</a>
-            {% else %}
-                <a href="{{ url_for('start_game', game_type='quiplash') }}" class="btn">Create Quiplash</a>
-            {% endif %}
+            <a id="quiplash-btn" href="{{ url_for('start_game', game_type='quiplash') }}" class="btn">
+                {{"Join Quiplash" if is_quiplash_running else "Start Quiplash" }}</a>
         </div>
     </div>
     

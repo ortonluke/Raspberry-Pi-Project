@@ -1,7 +1,10 @@
 {
     "Luke": {
-        "XP": 0,
-        "wins": 0,
-        "skylanders": []
+        "pin": "1111",
+        "skylander": "001"
+    },
+    "David": {
+        "pin": "1111",
+        "skylander": "002"
     }
 }
