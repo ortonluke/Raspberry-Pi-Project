@@ -85,22 +85,31 @@ def join_game(game_id):
     game = games.get(game_id)
     if not game:
         return "Game not found", 404
-    # For now just add a fake player
-    game["players"].append(f"Player{len(game['players'])+1}")
+    
+    username = session.get("username")
+    if username and username not in games[game_id]["players"]:
+        games[game_id]["players"].append(username)
+        
     return redirect(url_for("lobby", game_id=game_id))
+
+@app.route("/leave_game/<game_type>")
+def leave_game(game_type):
+    username = session.get("username")
+    if username and game_type in games:
+        if username in games[game_type]["players"]:
+            games[game_type]["players"].remove(username)
+    return redirect(url_for("welcome"))
+
 
 @app.route("/stop_game/<game_type>")
 def stop_game(game_type):
-    if game_type not in ["quiplash", "trivia"]:
-        return "Game not found", 404
-    
-    # mark it as stopped
-    games[game_type] = {"running": False}
-
-    # notify all clients
-    socketio.emit("game_update", {"game": game_type, "running": False})
-    
-    
+    if game_type in games:
+        games[game_type]["running"] = False
+        # Don't delete the "players" key, just keep it
+        # Optional: clear players if you want
+        games[game_type]["players"] = []
+        # Notify all clients
+        socketio.emit("game_update", {"game": game_type, "running": False})
     return redirect(url_for("welcome"))
 
 #debugging:

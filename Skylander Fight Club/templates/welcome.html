@@ -45,20 +45,22 @@
     <script>
         const socket = io("http://10.28.170.81:5000");
 
+        
+
         socket.on("connect", () => {
             console.log("Connected to server");
         });
 
         socket.on("game_update", (data) => {
-            console.log("Game update:", data);
+            const gameName = data.game.charAt(0).toUpperCase() + data.game.slice(1);
 
             const btn = document.getElementById(data.game + "-btn"); 
             if (btn) {
                 if (data.running) {
-                    btn.textContent = "Join " + data.game;
+                    btn.textContent = "Join " + gameName;
                     btn.href = "/lobby/" + data.game;
                 } else {
-                    btn.textContent = "Start " + data.game;
+                    btn.textContent = "Start " + gameName;
                     btn.href = "/start_game/" + data.game;
                 }
             }
