@@ -6,5 +6,21 @@
     "David": {
         "pin": "1111",
         "skylander": "002"
+    },
+    "User1": {
+        "pin": "1111",
+        "skylander": "003"
+    },
+    "User2": {
+        "pin": "1111",
+        "skylander": "004"
+    },
+    "User3": {
+        "pin": "1111",
+        "skylander": "005"
+    },
+    "User4": {
+        "pin": "1111",
+        "skylander": "006"
     }
 }

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import users
+import quiplash
 
 
 app = Flask(__name__)
@@ -60,7 +61,7 @@ def add_user():
             return redirect(url_for("login"))
         else:
             return render_template("add_user.html", error="Username already exists")
-    return render_template("login.html")
+    return render_template("add_user.html")
 
 
 #Game Functions
@@ -73,8 +74,15 @@ def start_game(game_type):
     # otherwise start it
     games[game_type] = {"running": True, "players": []}
     socketio.emit("game_update", {"game": game_type, "running": True})
+    start_quiplash()
     return redirect(url_for("lobby", game_name=game_type))
 
+def start_quiplash():
+    players = users.load_users()  # from users.json
+    games["quiplash"]["players"] = {u: {"score": 0} for u in players}
+    games["quiplash"]["pairings"] = quiplash.generate_pairings(players)
+    
+    print(games["quiplash"]["pairings"])
 
 @app.route("/lobby/<game_name>")
 def lobby(game_name):
@@ -95,6 +103,7 @@ def join_game(game_id):
 @app.route("/leave_game/<game_type>")
 def leave_game(game_type):
     username = session.get("username")
+    
     if username and game_type in games:
         if username in games[game_type]["players"]:
             games[game_type]["players"].remove(username)
@@ -124,8 +133,6 @@ def handle_disconnect():
 @socketio.on("game_update")
 def handle_game_update(data):
     print(f"Received game_update: {data}")
-
-
 
 if __name__ == "__main__":
     #app.run(host="0.0.0.0", port=5000)
