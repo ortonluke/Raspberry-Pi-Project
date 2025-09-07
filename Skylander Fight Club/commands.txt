@@ -3,3 +3,10 @@ python webApp.py
 
 Run with flask (most common):
 python -m flask --app webApp run --host=0.0.0.0
+
+
+
+Notes:
+
+{% else %}
+        <a href="{{ url_for('stop_voting', game_type='quiplash' )}}" class="btn">Start Voting</a>

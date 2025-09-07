@@ -79,8 +79,40 @@ def start_quiplash():
     players = users.load_users()  # from users.json
     games["quiplash"]["players"] = {u: {"score": 0} for u in players}
     games["quiplash"]["pairings"] = quiplash.generate_pairings(players)
+    games["quiplash"]["phase"] = "answering"
     
     print(games["quiplash"]["pairings"])
+
+@app.route("/start_voting/<game_type>")
+def start_voting(game_type):
+    game = games.get(game_type)
+    if game and game.get("running"):
+        game["phase"] = "voting"
+    return redirect(url_for("lobby", game_name=game_type))
+
+##@app.route("/vote/<game_type>", methods=["GET", "POST"])
+"""
+def vote(game_type):
+    username = session.get("username")
+    game = games.get(game_type)
+
+    if not game or game.get("phase") != "voting":
+        return redirect(url_for("lobby", game_name=game_type))
+
+    # Find the next pairing the user needs to vote on
+    for i, pairing in enumerate(game["pairings"]):
+        if username not in pairing["players"]:  # can't vote on your own
+            if username not in pairing["votes"]:
+                if request.method == "POST":
+                    choice = request.form["choice"]
+                    pairing["votes"][username] = choice
+                    return redirect(url_for("vote", game_type=game_type))
+                return render_template("vote.html", pairing=pairing, prompt_id=i)
+
+    # If no more votes left
+    return render_template("done_voting.html")
+"""
+
 
 @app.route("/lobby/<game_name>")
 def lobby(game_name):
@@ -98,8 +130,8 @@ def lobby(game_name):
                 current_prompt = pairing.copy()
                 current_prompt["id"] = i  # add index so we can reference later
                 break
-            
-    return render_template("lobby.html", game=game_name, current_prompt=current_prompt)
+    #return render_template("lobby.html", game=game_name, current_prompt=current_prompt)        
+    return render_template("lobby.html", game=game, current_prompt=current_prompt)
 
 def has_answered_all(game, username):
     for pairing in game["pairings"]:

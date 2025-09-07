@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head><title>Vote</title></head>
+<body>
+  <h2>{{ pairing.prompt }}</h2>
+  <form method="POST">
+    {% for player, answer in pairing.answers.items() %}
+      <button type="submit" name="choice" value="{{ player }}">{{ answer }}</button><br>
+    {% endfor %}
+  </form>
+</body>
+</html>
