@@ -1,13 +1,27 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>{{ game_name | capitalize }} Lobby</title>
-    </head>
-    <body>
-        <h1>{{ game_name | capitalize }} Lobby</h1>
+<head>
+    <title>{{ game_name | capitalize }} Lobby</title>
+</head>
+<body>
+    <h1>{{ game_name | capitalize }} Lobby</h1>
 
-        <a href="{{ url_for('leave_game', game_type='quiplash') }}" class="btn">Leave Quiplash</a>
+    <a href="{{ url_for('leave_game', game_type='quiplash') }}" class="btn">Leave Quiplash</a>
+    <a href="{{ url_for('stop_game', game_type='quiplash') }}" class="btn">Turn Off Quiplash</a>
 
-        <a href="{{ url_for('stop_game', game_type='quiplash') }}" class="btn">Turn Off Quiplash</a>
-    </body>
+    <hr>
+
+    {% if current_prompt %}
+        <h2>Prompt:</h2>
+        <p>{{ current_prompt["prompt"] }}</p>
+
+        <form action="{{ url_for('submit_answer', game_type='quiplash') }}" method="post">
+            <input type="hidden" name="prompt_id" value="{{ current_prompt['id'] }}">
+            <input type="text" name="answer" placeholder="Your answer" required>
+            <button type="submit">Submit</button>
+        </form>
+    {% else %}
+        <p>You’ve answered all your prompts. Waiting for others...</p>
+    {% endif %}
+</body>
 </html>

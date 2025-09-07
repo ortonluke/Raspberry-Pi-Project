@@ -9,8 +9,6 @@ app.secret_key = "supersecretkey"  # needed for sessions
 socketio = SocketIO(app)
 games = {"quiplash": {"running": False}}
 
-print("HELLO WORLD")
-
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -86,7 +84,28 @@ def start_quiplash():
 
 @app.route("/lobby/<game_name>")
 def lobby(game_name):
-    return render_template("lobby.html", game=game_name)
+    username = session.get("username")
+    game = games.get(game_name)
+
+    current_prompt = None
+    if username and game:
+        if has_answered_all(game, username):
+            render_template("lobby.html", game=game_name, current_prompt=current_prompt)
+            
+        # find the first pairing this user is in that they haven't answered yet
+        for i, pairing in enumerate(game["pairings"]):
+            if username in pairing["players"] and username not in pairing["answers"]:
+                current_prompt = pairing.copy()
+                current_prompt["id"] = i  # add index so we can reference later
+                break
+            
+    return render_template("lobby.html", game=game_name, current_prompt=current_prompt)
+
+def has_answered_all(game, username):
+    for pairing in game["pairings"]:
+        if username in pairing["players"] and username not in pairing["answers"]:
+            return False
+    return True
 
 @app.route("/join_game/<int:game_id>")
 def join_game(game_id):
@@ -106,7 +125,7 @@ def leave_game(game_type):
     
     if username and game_type in games:
         if username in games[game_type]["players"]:
-            games[game_type]["players"].remove(username)
+            games[game_type]["players"].pop(username, None)
     return redirect(url_for("welcome"))
 
 
@@ -117,9 +136,29 @@ def stop_game(game_type):
         # Don't delete the "players" key, just keep it
         # Optional: clear players if you want
         games[game_type]["players"] = []
+        
+        if game_type == "quiplash":
+            game = games.get("quiplash")
+            game["pairings"] = []
+            game["round"] = 1
+        
         # Notify all clients
         socketio.emit("game_update", {"game": game_type, "running": False})
     return redirect(url_for("welcome"))
+
+
+@app.route("/submit_answer/<game_type>", methods=["POST"])
+def submit_answer(game_type):
+    username = session.get("username")
+    game = games.get(game_type)
+    prompt_id = int(request.form["prompt_id"])
+    answer = request.form["answer"]
+
+    if username and game:
+        pairing = game["pairings"][prompt_id]
+        pairing["answers"][username] = answer  # save their answer
+
+    return redirect(url_for("lobby", game_name=game_type))
 
 #debugging:
 @socketio.on("connect")
